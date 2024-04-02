@@ -1,0 +1,31 @@
+.banner-container {
+    display: flex;
+    justify-content: center; /* Centraliza o conteúdo horizontalmente */
+    align-items: center; /* Centraliza o conteúdo verticalmente */
+    height: 674px; /* Altura do banner */
+    background-color: #ff914d;
+    background-size: cover; /* Redimensiona a imagem para cobrir todo o banner */
+    color: black; /* Cor do texto */
+    text-align: center; /* Alinhamento do texto */
+    max-width: 100%;
+}
+
+.banner-content {
+    max-width: 100%; /* Largura máxima do conteúdo */
+    padding: 20px; /* Espaçamento interno */
+}
+
+.banner-content h1 {
+    font-size: 48px; /* Tamanho da fonte do título */
+font-family: "Roboto", "Helvetica", "Arial", sans-serif; /* Fonte do título */
+font-weight: 400;
+}
+
+.banner-content h2 {
+font-size: 34px; /* Tamanho da fonte do subtítulo */
+font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+}
+
+.banner-content img{
+    width: 256px;
+}
