@@ -1,0 +1,45 @@
+.banner{
+    background-color: #8FD8D2;
+    text-align: center;
+}
+
+.banner img{
+    max-width: 100%;
+}
+.icon-login {
+  position: absolute;
+  top: 20px; /* Ajuste conforme necessário */
+  right: 20px; /* Ajuste conforme necessário */
+  margin-right: 0.5rem;
+  
+  
+}
+
+.color-icon{
+  color: #DF744A;
+}
+
+nav ul {
+    list-style-type: none; /* Remove os pontos da lista */
+    padding: 20;
+    display: flex;
+    justify-content: right; /* Centraliza os itens da lista */
+    gap: 15px; /* Espaçamento entre os itens da lista */
+    margin: 20px 0 0 0; /* Margem superior para separar do conteúdo acima */
+  }
+  
+  nav ul li {
+    display: inline; /* Exibe os itens em linha */
+  }
+  
+  nav ul li a {
+    text-decoration: none; /* Remove o sublinhado dos links */
+    color: #df744a; /* Cor do texto dos links */
+    padding: 5px 10px; /* Espaçamento interno dos links */
+    border-radius: 5px; /* Borda arredondada */
+    transition: background-color 0.3s; /* Transição suave para hover */
+    font-weight: bold;
+    font-size: 30px;
+  }
+  
+ 
