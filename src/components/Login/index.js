@@ -34,7 +34,7 @@ const LoginPage = () => {
         setLoading(false); // Ocultar carregamento
         const user = userCredential.user;
         console.log('User logged in:', user);
-        navigate('/services');
+        navigate('/');
       })
       .catch((error) => {
         setLoading(false); // Ocultar carregamento

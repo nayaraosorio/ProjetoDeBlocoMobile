@@ -7,7 +7,7 @@ import { authFB} from '../../firebaseConfig';
 import { firestoreDB } from '../../firebaseConfig'; 
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { addDoc, collection } from 'firebase/firestore'; 
-import { Navigate, useNavigate } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
 import './SubscribeForm.css';
 
 const theme = createTheme({
