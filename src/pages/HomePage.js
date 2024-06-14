@@ -1,6 +1,9 @@
 //O componente "HomePage" - Página principal
 
-import SimplePaper from "../components/PostCard";
+
+
+
+// import SimplePaper from "../components/PostCard";
 
 
 
@@ -11,7 +14,9 @@ import SimplePaper from "../components/PostCard";
     <>
     
     <h1>Home</h1>
-    <SimplePaper />
+    {/* <SimplePaper /> */}
+   
+   
     
     </>
    )

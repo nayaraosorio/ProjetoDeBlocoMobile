@@ -109,7 +109,7 @@ const LoginPage = () => {
             />
             {loading ? <CircularProgress /> : <Button type="submit">Entrar</Button>}
           </form>
-          {error && <p className="error">{error}</p>}
+         
           <p style={{ padding: '5px 0' }}>
             Não possui conta? <Link to="/products" style={{ fontWeight: 'bold' }}>Novo Cadastro</Link>
           </p>

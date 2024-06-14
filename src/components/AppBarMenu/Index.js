@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // Importe o componente Link e useNavigate do React Router
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -12,9 +12,8 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import CircularProgress from '@mui/material/CircularProgress'; // Importe o componente CircularProgress para o indicador de carregamento
-import { signOut, onAuthStateChanged } from 'firebase/auth'; // Importe a função de logout do Firebase e onAuthStateChanged
-import { authFB } from '../../firebaseConfig';
+import CircularProgress from '@mui/material/CircularProgress';
+import { useAuth } from '../../AuthContext';
 
 const pages = [
   { label: 'Home', link: '/' },
@@ -22,29 +21,23 @@ const pages = [
   { label: 'Membros', link: '/members' }
 ];
 
-const settings = ['Meu Perfil', 'Conta', 'Logout'];
+const settings = [
+  { label: 'Perfil', link: '/profile' },
+  { label: 'Conta', link: '/account' },
+  { label: 'Logout', action: 'logout' }
+];
 
 function ResponsiveAppBar() {
+  const { isAuthenticated, user, logout } = useAuth();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
-  const [loading, setLoading] = React.useState(false); // Estado para controlar o carregamento
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false); // Estado para controlar a autenticação do usuário
-  const navigate = useNavigate(); // Use o hook useNavigate para realizar o redirecionamento
-
-  React.useEffect(() => {
-    const unsubscribe = onAuthStateChanged(authFB, (user) => {
-      if (user) {
-        setIsAuthenticated(true);
-      } else {
-        setIsAuthenticated(false);
-      }
-    });
-    return () => unsubscribe();
-  }, []);
+  const [loading, setLoading] = React.useState(false);
+  const navigate = useNavigate();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
+
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
@@ -57,20 +50,18 @@ function ResponsiveAppBar() {
     setAnchorElUser(null);
   };
 
-  const handleLogout = () => {
-    setLoading(true); // Ativa o carregamento
-    signOut(authFB) // Realize o logout utilizando a função signOut do Firebase
-      .then(() => {
-        console.log('User logged out');
-        setLoading(false); // Desativa o carregamento
-        setAnchorElUser(null); // Fecha o menu do usuário
-        navigate('/'); // Redirecione para a página de Home após o logout
-      })
-      .catch((error) => {
-        console.error('Error logging out:', error);
-        setLoading(false); // Desativa o carregamento em caso de erro
-        alert('Erro ao fazer logout. Tente novamente.');
-      });
+  const handleLogout = async () => {
+    setLoading(true);
+    try {
+      await logout();
+      setLoading(false);
+      setAnchorElUser(null);
+      navigate('/');
+    } catch (error) {
+      console.error('Error logging out:', error);
+      setLoading(false);
+      alert('Erro ao fazer logout. Tente novamente.');
+    }
   };
 
   return (
@@ -132,7 +123,11 @@ function ResponsiveAppBar() {
             {isAuthenticated ? (
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                  {user?.avatar ? (
+                    <Avatar alt={user.displayName || 'User Avatar'} src={user.avatar} />
+                  ) : (
+                    <Avatar>{user?.displayName?.charAt(0) || 'U'}</Avatar>
+                  )}
                 </IconButton>
               </Tooltip>
             ) : (
@@ -160,8 +155,18 @@ function ResponsiveAppBar() {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={setting === 'Logout' ? handleLogout : handleCloseUserMenu}>
-                  <Typography textAlign="center" sx={{ color: '#df744a' }}>{setting}</Typography>
+                <MenuItem
+                  key={setting.label}
+                  onClick={() => {
+                    handleCloseUserMenu();
+                    if (setting.action === 'logout') {
+                      handleLogout();
+                    } else {
+                      navigate(setting.link);
+                    }
+                  }}
+                >
+                  <Typography textAlign="center" sx={{ color: '#df744a' }}>{setting.label}</Typography>
                 </MenuItem>
               ))}
             </Menu>
@@ -169,7 +174,6 @@ function ResponsiveAppBar() {
         </Toolbar>
       </Container>
 
-      {/* Exibe o indicador de carregamento quando o estado loading estiver ativo */}
       {loading && (
         <Box sx={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
           <CircularProgress sx={{ color: '#df744a' }} />
