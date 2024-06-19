@@ -8,6 +8,7 @@ import { createTheme } from '@mui/material/styles';
 import { Link, useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { authFB } from '../../firebaseConfig';
+import SubscribeModal from '../SubscribeModal'; // Importa o componente SubscribeModal
 
 const theme = createTheme({
   palette: {
@@ -22,9 +23,10 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isSubscribeModalOpen, setSubscribeModalOpen] = useState(false); // Estado para o modal
   const navigate = useNavigate();
 
-  function handleSignIn(e) {
+  const handleSignIn = (e) => {
     e.preventDefault();
     setError(null);
     setLoading(true); // Mostrar carregamento
@@ -42,7 +44,15 @@ const LoginPage = () => {
         console.error('Error logging in:', error);
         alert('Erro ao logar. Tente novamente.');
       });
-  }
+  };
+
+  const handleOpenSubscribeModal = () => {
+    setSubscribeModalOpen(true); // Abre o modal
+  };
+
+  const handleCloseSubscribeModal = () => {
+    setSubscribeModalOpen(false); // Fecha o modal
+  };
 
   return (
     <div className='estilo-form'>
@@ -109,15 +119,17 @@ const LoginPage = () => {
             />
             {loading ? <CircularProgress /> : <Button type="submit">Entrar</Button>}
           </form>
-         
+
           <p style={{ padding: '5px 0' }}>
-            Não possui conta? <Link to="/products" style={{ fontWeight: 'bold' }}>Novo Cadastro</Link>
+            Não possui conta? <span onClick={handleOpenSubscribeModal} style={{ fontWeight: 'bold', cursor: 'pointer', color: '#dc8239' }}>Novo Cadastro</span>
           </p>
           <p style={{ padding: '5px 0' }}>
-            Esqueceu a senha? <Link to="/subscribe" style={{ fontWeight: 'bold' }}>Clique Aqui</Link>
+            Esqueceu a senha? <Link to="/" style={{ fontWeight: 'bold', color: '#dc8239' }}>Clique Aqui</Link>
           </p>
         </div>
       </ThemeProvider>
+
+      <SubscribeModal open={isSubscribeModalOpen} onClose={handleCloseSubscribeModal} />
     </div>
   );
 }

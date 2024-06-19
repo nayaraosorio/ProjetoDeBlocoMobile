@@ -3,9 +3,6 @@
 
 
 
-// import SimplePaper from "../components/PostCard";
-
-
 
 
 
@@ -14,9 +11,7 @@
     <>
     
     <h1>Home</h1>
-    {/* <SimplePaper /> */}
-   
-   
+ 
     
     </>
    )

@@ -1,3 +1,4 @@
+// src/components/ResponsiveAppBar.js
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
@@ -13,11 +14,12 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import CircularProgress from '@mui/material/CircularProgress';
+import LoginModal from '../LoginModal'
 import { useAuth } from '../../AuthContext';
 
 const pages = [
   { label: 'Home', link: '/' },
-  { label: 'Fórum', link: '/services' },
+  { label: 'Fórum', link: '/postlist' },
   { label: 'Membros', link: '/members' }
 ];
 
@@ -32,6 +34,7 @@ function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
+  const [isLoginModalOpen, setLoginModalOpen] = React.useState(false);
   const navigate = useNavigate();
 
   const handleOpenNavMenu = (event) => {
@@ -62,6 +65,14 @@ function ResponsiveAppBar() {
       setLoading(false);
       alert('Erro ao fazer logout. Tente novamente.');
     }
+  };
+
+  const handleOpenLoginModal = () => {
+    setLoginModalOpen(true);
+  };
+
+  const handleCloseLoginModal = () => {
+    setLoginModalOpen(false);
   };
 
   return (
@@ -132,7 +143,7 @@ function ResponsiveAppBar() {
               </Tooltip>
             ) : (
               <Button
-                onClick={() => navigate('/login')}
+                onClick={handleOpenLoginModal}
                 sx={{ my: 2, color: '#df744a', display: 'relative', fontSize: '20px', fontWeight: 'bold' }}
               >
                 Login
@@ -179,6 +190,8 @@ function ResponsiveAppBar() {
           <CircularProgress sx={{ color: '#df744a' }} />
         </Box>
       )}
+
+      <LoginModal open={isLoginModalOpen} onClose={handleCloseLoginModal} />
     </AppBar>
   );
 }

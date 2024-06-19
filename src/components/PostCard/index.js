@@ -1,116 +1,153 @@
-// import React, { useState } from 'react';
-// import Box from '@mui/material/Box';
-// import Paper from '@mui/material/Paper';
-// import Avatar from '@mui/material/Avatar';
-// import Button from '@mui/material/Button';
-// import IconButton from '@mui/material/IconButton';
-// import ThumbUpIcon from '@mui/icons-material/ThumbUp';
-// import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-// import TextField from '@mui/material/TextField';
-// import Divider from '@mui/material/Divider';
-// import Typography from '@mui/material/Typography';
-// import { useAuth } from '../../AuthContext'; // Ajuste o caminho conforme a localização correta do AuthContext
-// import { firestoreDB } from '../../firebaseConfig'; // Ajuste o caminho conforme a localização correta do firebaseConfig
-// import { doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
-// import CommentCard from '../CommentCard/Index';
+// src/components/PostCard.js
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Card, CardContent, Typography, Avatar, Box, Link, IconButton } from '@mui/material';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import CommentIcon from '@mui/icons-material/Comment';
+import { useAuth } from '../../AuthContext';
 
-// export default function PostCard({ post }) {
-//   const { user, isAuthenticated } = useAuth();
-//   const [comment, setComment] = useState('');
-//   const postRef = doc(firestoreDB, 'posts', post.id);
+const PostCard = ({
+  title,
+  description,
+  date,
+  authorName,
+  authorImage,
+  keywords,
+  commentsCount,
+  likes,
+  dislikes,
+  onLike,
+  onDislike,
+  onComment,
+}) => {
+  const { user } = useAuth();
+  const isOwnPost = user?.displayName === authorName;
 
-//   const handleLike = async () => {
-//     await updateDoc(postRef, {
-//       likes: arrayUnion(user.uid),
-//       dislikes: arrayRemove(user.uid)
-//     });
-//   };
+  const handleLike = () => {
+    if (user) {
+      onLike();
+    } else {
+      alert('Você precisa estar logado para curtir.');
+    }
+  };
 
-//   const handleDislike = async () => {
-//     await updateDoc(postRef, {
-//       dislikes: arrayUnion(user.uid),
-//       likes: arrayRemove(user.uid)
-//     });
-//   };
+  const handleDislike = () => {
+    if (user) {
+      onDislike();
+    } else {
+      alert('Você precisa estar logado para descurtir.');
+    }
+  };
 
-//   const handleComment = async () => {
-//     if (comment.trim() !== '') {
-//       await updateDoc(postRef, {
-//         comments: arrayUnion({
-//           authorUID: user.uid,
-//           text: comment,
-//           timestamp: Date.now()
-//         })
-//       });
-//       setComment('');
-//     }
-//   };
+  const handleComment = () => {
+    if (user) {
+      onComment();
+    } else {
+      alert('Você precisa estar logado para comentar.');
+    }
+  };
 
-//   const formatDate = (timestamp) => {
-//     const date = new Date(timestamp);
-//     return date.toLocaleString(); // Ajuste o formato conforme necessário
-//   };
+  return (
+    <Card
+      sx={{
+        maxWidth: 600,
+        margin: '20px auto',
+        boxShadow: 3,
+        borderRadius: 2,
+        overflow: 'hidden',
+        border: '1px solid #f0f0f0',
+        backgroundColor: '#ffffff',
+        position: 'relative',
+      }}
+    >
+      <Box sx={{ position: 'absolute', top: 10, right: 10 }}>
+        <Link
+          href="#"
+          sx={{
+            color: '#dc8239',
+            fontWeight: 'bold',
+            textDecoration: 'none',
+            '&:hover': {
+              textDecoration: 'underline',
+              color: '#b65e2b',
+            },
+          }}
+        >
+          Denunciar
+        </Link>
+      </Box>
+      <CardContent sx={{ padding: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
+          <Avatar
+            src={authorImage}
+            alt={authorName || 'Autor desconhecido'}
+            sx={{
+              width: 56,
+              height: 56,
+              marginRight: 2,
+              backgroundColor: '#dc8239',
+              color: '#FEF9F6',
+            }}
+          >
+            {!authorImage && authorName ? authorName.charAt(0).toUpperCase() : 'A'}
+          </Avatar>
+          <Box>
+            <Typography variant="subtitle1" component="div" sx={{ fontWeight: 'bold' }}>
+              {authorName || 'Autor desconhecido'}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {new Date(date).toLocaleDateString()} - {new Date(date).toLocaleTimeString()}
+            </Typography>
+          </Box>
+        </Box>
+        <Typography variant="h5" component="div" sx={{ marginBottom: 1, fontWeight: 'bold', color: '#333' }}>
+          {title}
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ marginBottom: 2 }}>
+          {description.length > 100 ? `${description.slice(0, 100)}...` : description}
+        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ marginRight: 1 }}>
+            <strong>Palavras chave:</strong> {keywords.join(', ')}
+          </Typography>
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', marginTop: 2 }}>
+          <IconButton onClick={handleLike}>
+            <ThumbUpIcon color="primary" /> {likes}
+          </IconButton>
+          <IconButton onClick={handleComment}>
+            <CommentIcon color="primary" /> {commentsCount}
+          </IconButton>
+          {isOwnPost && (
+            <IconButton onClick={handleDislike}>
+              <ThumbDownIcon color="primary" /> {dislikes}
+            </IconButton>
+          )}
+        </Box>
+      </CardContent>
+    </Card>
+  );
+};
 
-//   if (!post) {
-//     return null; // Retorna null se post for undefined ou null
-//   }
+PostCard.propTypes = {
+  title: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+  date: PropTypes.string.isRequired,
+  authorName: PropTypes.string,
+  authorImage: PropTypes.string,
+  keywords: PropTypes.arrayOf(PropTypes.string).isRequired,
+  commentsCount: PropTypes.number.isRequired,
+  likes: PropTypes.number.isRequired,
+  dislikes: PropTypes.number.isRequired,
+  onLike: PropTypes.func.isRequired,
+  onDislike: PropTypes.func.isRequired,
+  onComment: PropTypes.func.isRequired,
+};
 
-//   return (
-//     <Box sx={{ maxWidth: 500, margin: 'auto', marginBottom: 2 }}>
-//       <Paper elevation={3} sx={{ padding: 2 }}>
-//         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-//           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-//             <Avatar sx={{ marginRight: 2 }}>{post.userInitial}</Avatar>
-//             <Box>
-//               <span>{post.userName}</span>
-//               <Typography variant="body2" color="textSecondary">
-//                 {formatDate(post.timestamp)}
-//               </Typography>
-//             </Box>
-//           </Box>
-//           <Button variant="text" color="secondary">Denunciar</Button>
-//         </Box>
-//         <Box sx={{ marginTop: 2, marginBottom: 2 }}>
-//           <p>{post.content}</p>
-//         </Box>
-//         {isAuthenticated && (
-//           <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-//             <IconButton aria-label="like" onClick={handleLike}>
-//               <ThumbUpIcon />
-//             </IconButton>
-//             <IconButton aria-label="dislike" onClick={handleDislike}>
-//               <ThumbDownIcon />
-//             </IconButton>
-//           </Box>
-//         )}
-//         <Divider sx={{ marginY: 2 }} />
-//         {isAuthenticated ? (
-//           <>
-//             <TextField 
-//               fullWidth 
-//               variant="outlined" 
-//               placeholder="Comentários" 
-//               value={comment}
-//               onChange={(e) => setComment(e.target.value)}
-//               onKeyPress={(e) => {
-//                 if (e.key === 'Enter') {
-//                   handleComment();
-//                 }
-//               }}
-//             />
-//             <Button onClick={handleComment}>Enviar</Button>
-//           </>
-//         ) : (
-//           <Typography variant="body2" color="textSecondary">
-//             Faça login para comentar
-//           </Typography>
-//         )}
-//         <Box sx={{ marginTop: 2 }}>
-//           {post.comments && post.comments.map((comment, index) => (
-//             <CommentCard key={index} comment={comment} isAuthenticated={isAuthenticated} />
-//           ))}
-//         </Box>
-//       </Paper>
-//     </Box>
-//   );
-// }
+PostCard.defaultProps = {
+  authorName: 'Autor desconhecido',
+  authorImage: '',
+};
+
+export default PostCard;

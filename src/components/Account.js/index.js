@@ -5,6 +5,7 @@ import { updateDoc, doc, getDoc, setDoc } from 'firebase/firestore';
 import { firestoreDB } from '../../firebaseConfig';
 import TextField from '@mui/material/TextField';
 import Button from '../Button';
+import Avatar from '@mui/material/Avatar';
 import { ThemeProvider } from '@mui/material/styles';
 import { createTheme } from '@mui/material/styles';
 import { getAuth } from 'firebase/auth';
@@ -96,6 +97,21 @@ function Account() {
           <h1 className='title'>Minha Conta</h1>
           {user ? (
             <form onSubmit={handleSubmit}>
+              <Avatar
+                src={image}
+                alt={name}
+                sx={{
+                  width: 100,
+                  height: 100,
+                  margin: 'auto',
+                  backgroundColor: '#dc8239',
+                  color: '#FEF9F6',
+                  fontSize: '2rem',
+                  marginBottom: 2,
+                }}
+              >
+                {!image && name.charAt(0).toUpperCase()}
+              </Avatar>
               <TextField
                 id="outlined-name"
                 label="Nome"
