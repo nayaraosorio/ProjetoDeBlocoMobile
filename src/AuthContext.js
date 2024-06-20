@@ -1,4 +1,3 @@
-// src/AuthContext.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { authFB, firestoreDB } from './firebaseConfig';
@@ -9,22 +8,34 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Adicionado estado de carregamento
-  const [authError, setAuthError] = useState(null); // Estado para armazenar erros de autenticação
+  const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(authFB, async (currentUser) => {
+      setLoading(true);
       if (currentUser) {
-        const userDoc = await getDoc(doc(firestoreDB, 'users', currentUser.uid));
-        const userData = userDoc.data();
-        const userWithAvatar = { ...currentUser, avatar: userData?.image };
-        setUser(userWithAvatar);
-        setIsAuthenticated(true);
+        try {
+          const userDoc = await getDoc(doc(firestoreDB, 'users', currentUser.uid));
+          const userData = userDoc.exists() ? userDoc.data() : null;
+          if (userData) {
+            const userWithAvatar = { ...currentUser, avatar: userData.image || '' };
+            setUser(userWithAvatar);
+            setIsAuthenticated(true);
+            localStorage.setItem('isAuthenticated', 'true');
+          } else {
+            throw new Error('User data not found');
+          }
+        } catch (error) {
+          console.error('Erro ao obter dados do usuário:', error);
+          setAuthError('Erro ao obter dados do usuário.');
+        }
       } else {
         setUser(null);
         setIsAuthenticated(false);
+        localStorage.removeItem('isAuthenticated');
       }
-      setLoading(false); // Atualizar o estado de carregamento
+      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -36,14 +47,18 @@ export const AuthProvider = ({ children }) => {
     try {
       const userCredential = await signInWithEmailAndPassword(authFB, email, password);
       const userDoc = await getDoc(doc(firestoreDB, 'users', userCredential.user.uid));
-      const userData = userDoc.data();
-      const userWithAvatar = { ...userCredential.user, avatar: userData?.image };
-      setUser(userWithAvatar);
-      setIsAuthenticated(true);
-      localStorage.setItem('isAuthenticated', 'true');
+      const userData = userDoc.exists() ? userDoc.data() : null;
+      if (userData) {
+        const userWithAvatar = { ...userCredential.user, avatar: userData.image || '' };
+        setUser(userWithAvatar);
+        setIsAuthenticated(true);
+        localStorage.setItem('isAuthenticated', 'true');
+      } else {
+        throw new Error('User data not found');
+      }
     } catch (error) {
       setAuthError('Falha ao fazer login. Verifique suas credenciais e tente novamente.');
-      console.error('Failed to login:', error);
+      console.error('Falha ao fazer login:', error);
     } finally {
       setLoading(false);
     }
@@ -51,6 +66,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     setLoading(true);
+    setAuthError(null);
     try {
       await signOut(authFB);
       setUser(null);
@@ -58,7 +74,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem('isAuthenticated');
     } catch (error) {
       setAuthError('Falha ao fazer logout. Tente novamente.');
-      console.error('Failed to logout:', error);
+      console.error('Falha ao fazer logout:', error);
     } finally {
       setLoading(false);
     }

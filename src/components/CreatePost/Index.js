@@ -1,23 +1,11 @@
+// src/components/CreatePostPopup.js
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';  // Importando PropTypes
 import { useAuth } from '../../AuthContext';
 import { firestoreDB } from '../../firebaseConfig';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { Box } from '@mui/system';
-import { ThemeProvider } from '@emotion/react';
-import { createTheme } from '@mui/material/styles';
-import TextField from '@mui/material/TextField';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import Button from '@mui/material/Button';
-import Alert from '@mui/material/Alert';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import { Box, Button, TextField, Select, MenuItem, InputLabel, FormControl, Alert, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
   palette: {
@@ -49,16 +37,7 @@ const CreatePostPopup = () => {
   }
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        gap: '10px',
-        overflowY: 'auto',
-        position: 'relative',
-        padding: '40px',
-        width: 'auto',
-      }}
-    >
+    <Box sx={{ display: 'flex', gap: '10px', overflowY: 'auto', position: 'relative', padding: '40px', width: 'auto' }}>
       <PopupWithTrigger buttonLabel="Faça sua Postagem" />
     </Box>
   );
@@ -99,6 +78,9 @@ const PopupWithTrigger = ({ buttonLabel }) => {
         authorName: user.displayName || user.email,
         authorImage: user.photoURL || '',
         createdAt: serverTimestamp(),
+        likes: 0,
+        dislikes: 0,
+        commentsCount: 0, // Initialize the comments count
       });
 
       resetForm();

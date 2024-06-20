@@ -15,7 +15,9 @@ const PostsList = ({ posts, onLike, onDislike, onComment }) => {
           date={post.createdAt}
           authorName={post.authorName}
           authorImage={post.authorImage}
-          keywords={post.keywords || []}
+          book={post.book} // Adicionado para passar o nome do livro
+          authors={post.authors || []} // Adicionado para passar os autores
+          genre={post.genre} // Adicionado para passar o gênero
           commentsCount={post.commentsCount || 0}
           likes={post.likes || 0}
           dislikes={post.dislikes || 0}
@@ -34,10 +36,12 @@ PostsList.propTypes = {
       id: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired,
       description: PropTypes.string.isRequired,
-      date: PropTypes.string.isRequired,
+      date: PropTypes.object.isRequired,
       authorName: PropTypes.string,
       authorImage: PropTypes.string,
-      keywords: PropTypes.arrayOf(PropTypes.string),
+      book: PropTypes.string, // Adicionado para validar a prop book
+      authors: PropTypes.arrayOf(PropTypes.string), // Adicionado para validar a prop authors
+      genre: PropTypes.string, // Adicionado para validar a prop genre
       commentsCount: PropTypes.number,
       likes: PropTypes.number,
       dislikes: PropTypes.number,

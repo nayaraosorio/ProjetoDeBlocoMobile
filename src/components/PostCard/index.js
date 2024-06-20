@@ -1,7 +1,7 @@
 // src/components/PostCard.js
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Card, CardContent, Typography, Avatar, Box, Link, IconButton } from '@mui/material';
+import { Card, CardContent, Typography, Avatar, Box, Link, IconButton, Button } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import CommentIcon from '@mui/icons-material/Comment';
@@ -9,11 +9,13 @@ import { useAuth } from '../../AuthContext';
 
 const PostCard = ({
   title,
-  description,
+  description = '',
   date,
   authorName,
   authorImage,
-  keywords,
+  book,
+  authors,
+  genre,
   commentsCount,
   likes,
   dislikes,
@@ -23,29 +25,19 @@ const PostCard = ({
 }) => {
   const { user } = useAuth();
   const isOwnPost = user?.displayName === authorName;
+  const [showFullDescription, setShowFullDescription] = useState(false);
 
-  const handleLike = () => {
-    if (user) {
-      onLike();
-    } else {
-      alert('Você precisa estar logado para curtir.');
+  // Converte o Timestamp para uma data legível
+  const formatDate = (timestamp) => {
+    if (timestamp && typeof timestamp.toDate === 'function') {
+      const dateObj = timestamp.toDate();
+      return `${dateObj.toLocaleDateString()} - ${dateObj.toLocaleTimeString()}`;
     }
+    return 'Data inválida';
   };
 
-  const handleDislike = () => {
-    if (user) {
-      onDislike();
-    } else {
-      alert('Você precisa estar logado para descurtir.');
-    }
-  };
-
-  const handleComment = () => {
-    if (user) {
-      onComment();
-    } else {
-      alert('Você precisa estar logado para comentar.');
-    }
+  const toggleDescription = () => {
+    setShowFullDescription(!showFullDescription);
   };
 
   return (
@@ -97,30 +89,45 @@ const PostCard = ({
               {authorName || 'Autor desconhecido'}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {new Date(date).toLocaleDateString()} - {new Date(date).toLocaleTimeString()}
+              {formatDate(date)}
             </Typography>
           </Box>
         </Box>
         <Typography variant="h5" component="div" sx={{ marginBottom: 1, fontWeight: 'bold', color: '#333' }}>
           {title}
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ marginBottom: 2 }}>
-          {description.length > 100 ? `${description.slice(0, 100)}...` : description}
-        </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
-          <Typography variant="body2" color="text.secondary" sx={{ marginRight: 1 }}>
-            <strong>Palavras chave:</strong> {keywords.join(', ')}
+        {book && (
+          <Typography variant="body2" color="text.secondary" sx={{ marginBottom: 2 }}>
+            <strong>Nome do Livro:</strong> {book}
           </Typography>
-        </Box>
+        )}
+        {authors.length > 0 && (
+          <Typography variant="body2" color="text.secondary" sx={{ marginBottom: 2 }}>
+            <strong>Autor(es):</strong> {authors.join(', ')}
+          </Typography>
+        )}
+        {genre && (
+          <Typography variant="body2" color="text.secondary" sx={{ marginBottom: 2 }}>
+            <strong>Gênero:</strong> {genre}
+          </Typography>
+        )}
+        <Typography variant="body2" color="text.secondary" sx={{ marginBottom: 2 }}>
+          {showFullDescription ? description : description.slice(0, 100)}
+          {description.length > 100 && (
+            <Button onClick={toggleDescription} sx={{ color: '#dc8239' }}>
+              {showFullDescription ? 'Ver menos' : 'Ver mais'}
+            </Button>
+          )}
+        </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', marginTop: 2 }}>
-          <IconButton onClick={handleLike}>
+          <IconButton onClick={onLike}>
             <ThumbUpIcon color="primary" /> {likes}
           </IconButton>
-          <IconButton onClick={handleComment}>
+          <IconButton onClick={onComment}>
             <CommentIcon color="primary" /> {commentsCount}
           </IconButton>
           {isOwnPost && (
-            <IconButton onClick={handleDislike}>
+            <IconButton onClick={onDislike}>
               <ThumbDownIcon color="primary" /> {dislikes}
             </IconButton>
           )}
@@ -132,11 +139,13 @@ const PostCard = ({
 
 PostCard.propTypes = {
   title: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
-  date: PropTypes.string.isRequired,
+  description: PropTypes.string,
+  date: PropTypes.object.isRequired, // Espera-se que seja um objeto Timestamp do Firebase
   authorName: PropTypes.string,
   authorImage: PropTypes.string,
-  keywords: PropTypes.arrayOf(PropTypes.string).isRequired,
+  book: PropTypes.string,
+  authors: PropTypes.arrayOf(PropTypes.string),
+  genre: PropTypes.string,
   commentsCount: PropTypes.number.isRequired,
   likes: PropTypes.number.isRequired,
   dislikes: PropTypes.number.isRequired,
@@ -148,6 +157,10 @@ PostCard.propTypes = {
 PostCard.defaultProps = {
   authorName: 'Autor desconhecido',
   authorImage: '',
+  description: '', // Default value to ensure it's not undefined
+  book: '', // Default value for book
+  authors: [],
+  genre: '',
 };
 
 export default PostCard;
