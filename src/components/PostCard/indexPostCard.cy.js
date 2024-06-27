@@ -1,11 +1,9 @@
 import React from 'react'
-import HomePage from './HomePage'
+import PostCard from './index'
 
-
-
-describe('<HomePage />', () => {
+describe('<PostCard />', () => {
   it('renders', () => {
     // see: https://on.cypress.io/mounting-react
-    cy.mount(<HomePage />)
+    cy.mount(<PostCard />)
   })
 })

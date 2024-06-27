@@ -8,7 +8,8 @@ import { createTheme } from '@mui/material/styles';
 import { Link, useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { authFB } from '../../firebaseConfig';
-import SubscribeModal from '../SubscribeModal'; // Importa o componente SubscribeModal
+import SubscribeModal from '../SubscribeModal';
+import Alert from '@mui/material/Alert';
 
 const theme = createTheme({
   palette: {
@@ -23,35 +24,34 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [isSubscribeModalOpen, setSubscribeModalOpen] = useState(false); // Estado para o modal
+  const [isSubscribeModalOpen, setSubscribeModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleSignIn = (e) => {
     e.preventDefault();
     setError(null);
-    setLoading(true); // Mostrar carregamento
+    setLoading(true);
 
     signInWithEmailAndPassword(authFB, email, password)
       .then((userCredential) => {
-        setLoading(false); // Ocultar carregamento
+        setLoading(false);
         const user = userCredential.user;
         console.log('User logged in:', user);
         navigate('/');
       })
       .catch((error) => {
-        setLoading(false); // Ocultar carregamento
-        setError(error.message);
+        setLoading(false);
+        setError('Erro ao logar. Tente novamente.');
         console.error('Error logging in:', error);
-        alert('Erro ao logar. Tente novamente.');
       });
   };
 
   const handleOpenSubscribeModal = () => {
-    setSubscribeModalOpen(true); // Abre o modal
+    setSubscribeModalOpen(true);
   };
 
   const handleCloseSubscribeModal = () => {
-    setSubscribeModalOpen(false); // Fecha o modal
+    setSubscribeModalOpen(false);
   };
 
   return (
@@ -119,6 +119,8 @@ const LoginPage = () => {
             />
             {loading ? <CircularProgress /> : <Button type="submit">Entrar</Button>}
           </form>
+
+          {error && <Alert severity="error" className="MuiAlert-message">{error}</Alert>}
 
           <p style={{ padding: '5px 0' }}>
             Não possui conta? <span onClick={handleOpenSubscribeModal} style={{ fontWeight: 'bold', cursor: 'pointer', color: '#dc8239' }}>Novo Cadastro</span>

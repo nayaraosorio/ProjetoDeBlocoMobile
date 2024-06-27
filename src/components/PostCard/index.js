@@ -1,7 +1,6 @@
-// src/components/PostCard.js
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Card, CardContent, Typography, Avatar, Box, Link, IconButton, Button } from '@mui/material';
+import { Card, CardContent, Typography, Avatar, Box, Link, IconButton, Button, Modal, TextareaAutosize } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import CommentIcon from '@mui/icons-material/Comment';
@@ -14,8 +13,6 @@ const PostCard = ({
   authorName,
   authorImage,
   book,
-  authors,
-  genre,
   commentsCount,
   likes,
   dislikes,
@@ -24,10 +21,10 @@ const PostCard = ({
   onComment,
 }) => {
   const { user } = useAuth();
-  const isOwnPost = user?.displayName === authorName;
+  const isOwnPost = user?.uid === authorName;
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false); // Estado para controlar o modal de denúncia
 
-  // Converte o Timestamp para uma data legível
   const formatDate = (timestamp) => {
     if (timestamp && typeof timestamp.toDate === 'function') {
       const dateObj = timestamp.toDate();
@@ -38,6 +35,14 @@ const PostCard = ({
 
   const toggleDescription = () => {
     setShowFullDescription(!showFullDescription);
+  };
+
+  const handleReport = () => {
+    setReportOpen(true);
+  };
+
+  const handleCloseReport = () => {
+    setReportOpen(false);
   };
 
   return (
@@ -56,6 +61,7 @@ const PostCard = ({
       <Box sx={{ position: 'absolute', top: 10, right: 10 }}>
         <Link
           href="#"
+          onClick={handleReport}
           sx={{
             color: '#dc8239',
             fontWeight: 'bold',
@@ -96,21 +102,9 @@ const PostCard = ({
         <Typography variant="h5" component="div" sx={{ marginBottom: 1, fontWeight: 'bold', color: '#333' }}>
           {title}
         </Typography>
-        {book && (
-          <Typography variant="body2" color="text.secondary" sx={{ marginBottom: 2 }}>
-            <strong>Nome do Livro:</strong> {book}
-          </Typography>
-        )}
-        {authors.length > 0 && (
-          <Typography variant="body2" color="text.secondary" sx={{ marginBottom: 2 }}>
-            <strong>Autor(es):</strong> {authors.join(', ')}
-          </Typography>
-        )}
-        {genre && (
-          <Typography variant="body2" color="text.secondary" sx={{ marginBottom: 2 }}>
-            <strong>Gênero:</strong> {genre}
-          </Typography>
-        )}
+        <Typography variant="body2" color="text.secondary" sx={{ marginBottom: 2 }}>
+          Livro: {book}
+        </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ marginBottom: 2 }}>
           {showFullDescription ? description : description.slice(0, 100)}
           {description.length > 100 && (
@@ -126,13 +120,39 @@ const PostCard = ({
           <IconButton onClick={onComment}>
             <CommentIcon color="primary" /> {commentsCount}
           </IconButton>
+          <IconButton onClick={onDislike}>
+            <ThumbDownIcon color="primary" />
+          </IconButton>
           {isOwnPost && (
-            <IconButton onClick={onDislike}>
-              <ThumbDownIcon color="primary" /> {dislikes}
-            </IconButton>
+            <Typography variant="body2" color="text.secondary" sx={{ marginLeft: 1 }}>
+              {dislikes} {dislikes === 1 ? 'dislike' : 'dislikes'}
+            </Typography>
           )}
         </Box>
       </CardContent>
+
+      <Modal
+        open={reportOpen}
+        onClose={handleCloseReport}
+        className="report-modal"
+        aria-labelledby="report-modal-title"
+        aria-describedby="report-modal-description"
+      >
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, padding: 4, backgroundColor: 'white', borderRadius: 1 }}>
+          <Typography id="report-modal-title" variant="h6" component="h2">
+            Denunciar Postagem
+          </Typography>
+          <TextareaAutosize
+            minRows={3}
+            placeholder="Explique o motivo da denúncia"
+            style={{ width: '100%' }}
+            id="report-modal-description"
+          />
+          <Button onClick={handleCloseReport} variant="contained" color="primary">
+            Enviar
+          </Button>
+        </Box>
+      </Modal>
     </Card>
   );
 };
@@ -140,12 +160,10 @@ const PostCard = ({
 PostCard.propTypes = {
   title: PropTypes.string.isRequired,
   description: PropTypes.string,
-  date: PropTypes.object.isRequired, // Espera-se que seja um objeto Timestamp do Firebase
+  date: PropTypes.object.isRequired,
   authorName: PropTypes.string,
   authorImage: PropTypes.string,
-  book: PropTypes.string,
-  authors: PropTypes.arrayOf(PropTypes.string),
-  genre: PropTypes.string,
+  book: PropTypes.string.isRequired,
   commentsCount: PropTypes.number.isRequired,
   likes: PropTypes.number.isRequired,
   dislikes: PropTypes.number.isRequired,
@@ -157,10 +175,7 @@ PostCard.propTypes = {
 PostCard.defaultProps = {
   authorName: 'Autor desconhecido',
   authorImage: '',
-  description: '', // Default value to ensure it's not undefined
-  book: '', // Default value for book
-  authors: [],
-  genre: '',
+  description: '',
 };
 
 export default PostCard;

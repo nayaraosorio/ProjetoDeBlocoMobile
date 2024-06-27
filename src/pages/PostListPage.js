@@ -19,7 +19,7 @@ const PostsListPage = () => {
         const postsData = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
-          createdAt: doc.data().createdAt || null, // Certifique-se de que o campo 'createdAt' é um Timestamp válido
+          createdAt: doc.data().createdAt || null,
         }));
         setPosts(postsData);
       } catch (error) {
@@ -77,7 +77,6 @@ const PostsListPage = () => {
   }
 
   return (
-    
     <div>
       <CreatePostPopup />
       <PostsList

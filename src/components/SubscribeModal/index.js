@@ -1,4 +1,3 @@
-// src/components/SubscribeModal.js
 import React from 'react';
 import PropTypes from 'prop-types';
 import Modal from '@mui/material/Modal';
@@ -13,9 +12,7 @@ const SubscribeModal = ({ open, onClose }) => {
       aria-labelledby="subscribe-modal-title"
       aria-describedby="subscribe-modal-description"
     >
-      <Box sx={styles.modalBox}>
-       
-        
+      <Box sx={styles.modalBox} role="dialog">
         <SubscribeForm />
       </Box>
     </Modal>

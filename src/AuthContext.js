@@ -90,3 +90,5 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   return useContext(AuthContext);
 };
+
+export { AuthContext };  // Adicione esta linha para garantir que AuthContext seja exportado
